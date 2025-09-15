@@ -16,15 +16,16 @@ export class EquipmentsController {
   }
 
   @Get('search')
-    search(
-        @Query('name') name?: string,
-        @Query('minPrice') minPrice?: string,
-        @Query('maxPrice') maxPrice?: string,
-    ){
-        let results = this.equipmentsService.findAll();
-
+  search(
+    @Query('name') name?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+  ){
+    let results = this.equipmentsService.findAll();
         if (name) results = results.filter (e => e.name.toLowerCase().includes(name.toLocaleLowerCase()));
         if (minPrice) results = results.filter (e => e.pricePerDay >= Number(minPrice));
         if (maxPrice) results = results.filter (e => e.pricePerDay <= Number(maxPrice));
+        console.log("Results:",results);
+        return results;
     }
 }
