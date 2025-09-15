@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
 
 @Controller('equipments')
@@ -14,4 +14,17 @@ export class EquipmentsController {
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.equipmentsService.findOne(id);
   }
+
+  @Get('search')
+    search(
+        @Query('name') name?: string,
+        @Query('minPrice') minPrice?: string,
+        @Query('maxPrice') maxPrice?: string,
+    ){
+        let results = this.equipmentsService.findAll();
+
+        if (name) results = results.filter (e => e.name.toLowerCase().includes(name.toLocaleLowerCase()));
+        if (minPrice) results = results.filter (e => e.pricePerDay >= Number(minPrice));
+        if (maxPrice) results = results.filter (e => e.pricePerDay <= Number(maxPrice));
+    }
 }
