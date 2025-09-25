@@ -8,3 +8,4 @@ import { EquipmentsService } from './equipments.service';
   exports: [EquipmentsService]
 })
 export class EquipmentsModule {}
+//alsjihab
