@@ -24,4 +24,7 @@ export class EquipmentsService {
     if (!item) throw new NotFoundException(`Echipament cu id ${id} nu a fost găsit.`);
     return item;
   }
+  findByType(type:string){
+    return this.equipments.find(u => u.type === type);
+  }
 }

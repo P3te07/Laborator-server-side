@@ -1,5 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
+import { UppercasePipe } from 'src/uppercase/uppercase.pipe';
 
 @Controller('equipments')
 export class EquipmentsController {
@@ -28,4 +29,9 @@ export class EquipmentsController {
         console.log("Results:",results);
         return results;
     }
+  @Get('type/:type')
+  findByType(@Param('type', UppercasePipe) type: string) {
+    return this.equipmentsService.findByType(type);
+  }
+
 }
