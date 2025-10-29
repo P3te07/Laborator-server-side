@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Patch, Param, Body, Query, ParseIntPipe, UsePipes, ValidationPipe,} from '@nestjs/common';
+import {Controller, Get, Post, Patch, Param, Body, Query, ParseIntPipe, UsePipes, ValidationPipe, Put,} from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto';
@@ -49,7 +49,7 @@ export class EquipmentsController {
     return this.equipmentsService.create(createEquipmentDto);
   }
 
-  @Patch(':id')
+  @Put('/:id')
   update(
     @Param('id') id: string,
     @Body() updateEquipmentDto: UpdateEquipmentDto,

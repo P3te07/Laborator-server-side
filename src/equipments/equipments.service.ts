@@ -65,9 +65,19 @@ export class EquipmentsService {
     return newEquipment;
   }
 
-  update(id: number, updateEquipmentDto: UpdateEquipmentDto) {
-    const equipment = this.findOne(id);
-    Object.assign(equipment, updateEquipmentDto);
-    return equipment;
-  }
+    update(id: number, updateEquipmentDto: UpdateEquipmentDto) {
+      let equipment = this.findOne(id);
+
+      equipment = {
+        ...equipment,
+        type: updateEquipmentDto.type ?? equipment.type,
+        pricePerDay: updateEquipmentDto.pricePerDay ?? equipment.pricePerDay,
+        available: updateEquipmentDto.available ?? equipment.available,
+        location: updateEquipmentDto.location ?? equipment.location,
+        year: updateEquipmentDto.year ?? equipment.year
+      }
+
+      this.equipments[this.equipments.findIndex(e => e.id ===id)] = equipment;
+      return equipment;
+    }
 }

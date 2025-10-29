@@ -1,4 +1,5 @@
 import { IsString, IsNumber, IsBoolean, IsOptional, Length } from 'class-validator';
+import { IsValidCategory } from 'src/categories/is-valid-category.validator';
 
 export class CreateEquipmentDto {
   @IsString()
@@ -6,6 +7,7 @@ export class CreateEquipmentDto {
   name: string;
 
   @IsString({ message: 'Tipul trebuie să fie un string valid.' })
+  @IsValidCategory({ message: 'Tipul specificat nu există ca şi categorie.' })
   type: string;
 
   @IsNumber({}, { message: 'Prețul per zi trebuie să fie un număr.' })
