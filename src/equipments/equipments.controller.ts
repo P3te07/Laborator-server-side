@@ -1,12 +1,61 @@
-import {Controller, Get, Post, Patch, Param, Body, Query, ParseIntPipe, UsePipes, ValidationPipe, Put,} from '@nestjs/common';
+import {Controller, Get, Post, Param, Body, Query, ParseIntPipe, UsePipes, ValidationPipe, Put, UseInterceptors, UploadedFile, Res, HttpCode,HttpStatus} from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto';
-import { UppercasePipe } from 'src/uppercase/uppercase.pipe';
+import { UppercasePipe } from 'src/common/pipes/uppercase.pipe';
+import { FileInterceptor } from '@nestjs/platform-express';
+import type { Response } from 'express';
+import { CsvValidationPipe } from 'src/common/pipes/csv-validation.pipe';
+import * as fs from 'fs'
+
+
 
 @Controller('equipments')
 export class EquipmentsController {
   constructor(private readonly equipmentsService: EquipmentsService) {}
+
+  @Post('import')
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file'))
+  async importCsv(
+    @UploadedFile(CsvValidationPipe) file: Express.Multer.File,
+  ) {
+    return this.equipmentsService.importFromCsv(file.buffer);
+  }
+
+
+  @Get('export')
+  async exportCsv(
+    @Res() res: Response,
+    @Query('name') name?: string,
+    @Query('type') type?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+    @Query('available') available?: string,
+  ) {
+    // Parsează filtrele
+    const filters: any = {};
+    if (name) filters.name = name;
+    if (type) filters.type = type;
+    if (minPrice) filters.minPrice = parseFloat(minPrice);
+    if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
+    if (available !== undefined) {
+      filters.available = available === 'true';
+    }
+
+    const { filePath, filename } = await this.equipmentsService.exportToCsv(filters);
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+    // Șterge fișierul după trimitere
+    fileStream.on('end', () => {
+      fs.unlinkSync(filePath);
+    });
+  }
 
   @Get('list')
   getAll() {
@@ -43,7 +92,6 @@ export class EquipmentsController {
   }
 
   @Post('add')
-  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   create(@Body() createEquipmentDto: CreateEquipmentDto) {
     console.log('Creating equipment:', createEquipmentDto);
     return this.equipmentsService.create(createEquipmentDto);

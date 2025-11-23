@@ -1,0 +1,2 @@
+name,type,pricePerDay,available,location,year
+ABC,Tractor,100,true,Test,2020

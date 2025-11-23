@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UppercasePipe } from 'src/uppercase/uppercase.pipe';
+import { UppercasePipe } from 'src/common/pipes/uppercase.pipe';
 
 @Controller('users')
 export class UsersController {
