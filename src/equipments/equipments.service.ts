@@ -1,4 +1,7 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Like } from 'typeorm';
+import { Equipment } from './entities/equipment.entity';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto';
 import { CategoriesService } from '../categories/categories.service';
@@ -6,88 +9,88 @@ import { parse } from 'csv-parse/sync';
 import { createObjectCsvWriter } from 'csv-writer';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import * as fs from 'fs'
-import * as path from 'path'
-
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class EquipmentsService {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(
+    @InjectRepository(Equipment)
+    private equipmentsRepository: Repository<Equipment>,
+    private readonly categoriesService: CategoriesService,
+  ) {}
 
-  private equipments = [
-    { id: 1, name: 'Tractor John Deere 5075E', type: 'Tractor', pricePerDay: 120, available: true, location: 'Chișinău', year: 2018 },
-    { id: 2, name: 'Combine Claas Lexion 760', type: 'Combine', pricePerDay: 450, available: false, location: 'Bălți', year: 2016 },
-    { id: 3, name: 'Plug Lemken 4 brazde', type: 'Plug', pricePerDay: 60, available: true, location: 'Ungheni', year: 2012 },
-    { id: 4, name: 'Semănătoare Amazone', type: 'Semănătoare', pricePerDay: 80, available: true, location: 'Cahul', year: 2019 },
-    { id: 5, name: 'Cuțit cosechină', type: 'Atasament', pricePerDay: 25, available: true, location: 'Orhei', year: 2015 },
-    { id: 6, name: 'Remorcă 6 tone', type: 'Remorcă', pricePerDay: 50, available: false, location: 'Soroca', year: 2014 },
-    { id: 7, name: 'Fertilizer spreader', type: 'Distribuitor de îngrășăminte', pricePerDay: 45, available: true, location: 'Criuleni', year: 2017 },
-    { id: 8, name: 'Cultivator Kverneland', type: 'Cultivator', pricePerDay: 70, available: true, location: 'Hâncești', year: 2013 },
-    { id: 9, name: 'Buldoexcavator JCB', type: 'Buldoexcavator', pricePerDay: 200, available: false, location: 'Anenii Noi', year: 2011 },
-    { id: 10, name: 'Stivuitor Toyota 2t', type: 'Stivuitor', pricePerDay: 90, available: true, location: 'Dubăsari', year: 2020 },
-  ];
-
-  findAll() {
-    return this.equipments.map(equipment => {
-      const category = this.categoriesService.findByName(equipment.type);
-      return {
-        ...equipment,
-        categoryId: category ? category.id : null,
-      };
+  async findAll() {
+    return await this.equipmentsRepository.find({
+      order: { id: 'ASC' },
     });
   }
 
-  findOne(id: number) {
-    const equipment = this.equipments.find(e => e.id === id);
+  async findOne(id: number) {
+    const equipment = await this.equipmentsRepository.findOne({ 
+      where: { id } 
+    });
     if (!equipment) {
       throw new NotFoundException(`Echipament cu id ${id} nu a fost găsit.`);
     }
-    const category = this.categoriesService.findByName(equipment.type);
-    return {
-      ...equipment,
-      categoryId: category ? category.id : null,
-    };
+    return equipment;
   }
 
-  findByType(type: string) {
-    const results = this.equipments.filter(e => e.type.toLowerCase() === type.toLowerCase());
+  async findByType(type: string) {
+    const results = await this.equipmentsRepository.find({
+      where: { type: Like(`%${type}%`) },
+    });
     if (results.length === 0) {
       throw new NotFoundException(`Nu s-au găsit echipamente de tipul ${type}.`);
     }
-    return results.map(equipment => {
-      const category = this.categoriesService.findByName(equipment.type);
-      return {
-        ...equipment,
-        categoryId: category ? category.id : null,
-      };
-    });
+    return results;
   }
 
-  create(createEquipmentDto: CreateEquipmentDto) {
-    const newEquipment = {
-      id: this.equipments.length + 1,
-      ...createEquipmentDto,
-    };
-    this.equipments.push(newEquipment);
-    return newEquipment;
+  async create(createEquipmentDto: CreateEquipmentDto) {
+    const equipment = this.equipmentsRepository.create(createEquipmentDto);
+    return await this.equipmentsRepository.save(equipment);
   }
 
-  update(id: number, updateEquipmentDto: UpdateEquipmentDto) {
-    let equipment = this.findOne(id);
-
-    equipment = {
-      ...equipment,
-      type: updateEquipmentDto.type ?? equipment.type,
-      pricePerDay: updateEquipmentDto.pricePerDay ?? equipment.pricePerDay,
-      available: updateEquipmentDto.available ?? equipment.available,
-      location: updateEquipmentDto.location ?? equipment.location,
-      year: updateEquipmentDto.year ?? equipment.year
-    };
-
-    this.equipments[this.equipments.findIndex(e => e.id === id)] = equipment;
-    return equipment;
+  async update(id: number, updateEquipmentDto: UpdateEquipmentDto) {
+    const equipment = await this.findOne(id);
+    Object.assign(equipment, updateEquipmentDto);
+    return await this.equipmentsRepository.save(equipment);
   }
-  
+
+  async remove(id: number) {
+    const equipment = await this.findOne(id);
+    await this.equipmentsRepository.remove(equipment);
+    return { message: `Echipament cu id ${id} a fost șters.` };
+  }
+
+  async search(filters: {
+    name?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  }) {
+    const queryBuilder = this.equipmentsRepository.createQueryBuilder('equipment');
+
+    if (filters.name) {
+      queryBuilder.andWhere('equipment.name LIKE :name', { 
+        name: `%${filters.name}%` 
+      });
+    }
+    if (filters.minPrice !== undefined) {
+      queryBuilder.andWhere('equipment.pricePerDay >= :minPrice', { 
+        minPrice: filters.minPrice 
+      });
+    }
+    if (filters.maxPrice !== undefined) {
+      queryBuilder.andWhere('equipment.pricePerDay <= :maxPrice', { 
+        maxPrice: filters.maxPrice 
+      });
+    }
+
+    return await queryBuilder.getMany();
+  }
+
+  // ========== CSV IMPORT ==========
+
   async importFromCsv(buffer: Buffer): Promise<any> {
     const csvText = buffer.toString('utf-8');
     
@@ -135,14 +138,11 @@ export class EquipmentsService {
       const errors = await validate(dto);
 
       if (errors.length === 0) {
-        const newEquipment = {
-          id: this.equipments.length + 1,
-          ...dto,
-        };
-        this.equipments.push(newEquipment);
+        const equipment = this.equipmentsRepository.create(dto);
+        const saved = await this.equipmentsRepository.save(equipment);
         validRecords.push({
           row: i + 1,
-          data: dto,
+          data: saved,
         });
       } else {
         const errorMessages = errors.map(error => ({
@@ -169,6 +169,7 @@ export class EquipmentsService {
     };
   }
 
+  // ========== CSV EXPORT ==========
 
   async exportToCsv(filters?: {
     name?: string;
@@ -178,29 +179,35 @@ export class EquipmentsService {
     available?: boolean;
   }): Promise<{ filePath: string; filename: string }> {
     
-    let data = [...this.equipments];
+    const queryBuilder = this.equipmentsRepository.createQueryBuilder('equipment');
 
-    if (filters) {
-      if (filters.name) {
-        data = data.filter(e => 
-          e.name.toLowerCase().includes(filters.name!.toLowerCase())
-        );
-      }
-      if (filters.type) {
-        data = data.filter(e => 
-          e.type.toLowerCase() === filters.type!.toLowerCase()
-        );
-      }
-      if (filters.minPrice !== undefined) {
-        data = data.filter(e => e.pricePerDay >= filters.minPrice!);
-      }
-      if (filters.maxPrice !== undefined) {
-        data = data.filter(e => e.pricePerDay <= filters.maxPrice!);
-      }
-      if (filters.available !== undefined) {
-        data = data.filter(e => e.available === filters.available!);
-      }
+    if (filters?.name) {
+      queryBuilder.andWhere('equipment.name LIKE :name', { 
+        name: `%${filters.name}%` 
+      });
     }
+    if (filters?.type) {
+      queryBuilder.andWhere('equipment.type = :type', { 
+        type: filters.type 
+      });
+    }
+    if (filters?.minPrice !== undefined) {
+      queryBuilder.andWhere('equipment.pricePerDay >= :minPrice', { 
+        minPrice: filters.minPrice 
+      });
+    }
+    if (filters?.maxPrice !== undefined) {
+      queryBuilder.andWhere('equipment.pricePerDay <= :maxPrice', { 
+        maxPrice: filters.maxPrice 
+      });
+    }
+    if (filters?.available !== undefined) {
+      queryBuilder.andWhere('equipment.available = :available', { 
+        available: filters.available 
+      });
+    }
+
+    const data = await queryBuilder.getMany();
 
     const filename = `equipments_export_${Date.now()}.csv`;
     const filePath = path.join(process.cwd(), 'uploads', filename);

@@ -2,6 +2,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { useContainer } from 'class-validator';
+import { ConfigService } from '@nestjs/config';
+import 'reflect-metadata'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +17,10 @@ async function bootstrap() {
     }),
   );
   
-  await app.listen(3000);
+  const configService = app.get(ConfigService);
+  const port = configService.get('PORT') || 3000;
+  
+  await app.listen(port);
+  console.log(`🚀 Application running on: http://localhost:${port}`);
 }
 bootstrap();

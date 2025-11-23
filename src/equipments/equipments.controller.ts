@@ -70,18 +70,12 @@ export class EquipmentsController {
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
   ) {
-    let results = this.equipmentsService.findAll();
-
-    if (name)
-      results = results.filter((e) =>
-        e.name.toLowerCase().includes(name.toLowerCase()),
-      );
-    if (minPrice) results = results.filter((e) => e.pricePerDay >= +minPrice);
-    if (maxPrice) results = results.filter((e) => e.pricePerDay <= +maxPrice);
-
-    console.log('Results:', results);
-    return results;
-  }
+  return this.equipmentsService.search({
+    name,
+    minPrice: minPrice ? parseFloat(minPrice) : undefined,
+    maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+  });
+}
 
   @Get('type/:type')
   findByType(@Param('type', UppercasePipe) type: string) {

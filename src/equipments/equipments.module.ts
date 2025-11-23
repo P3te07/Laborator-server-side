@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Equipment } from './entities/equipment.entity';
 import { EquipmentsController } from './equipments.controller';
 import { EquipmentsService } from './equipments.service';
 import { CategoriesModule } from '../categories/categories.module';
-import { IsValidCategory, IsValidCategoryConstraint } from 'src/categories/is-valid-category.validator';
-
 
 @Module({
-  imports: [CategoriesModule],  
+  imports: [TypeOrmModule.forFeature([Equipment]),CategoriesModule],
   controllers: [EquipmentsController],
-  providers: [EquipmentsService, IsValidCategoryConstraint],
-  exports: [EquipmentsService, IsValidCategoryConstraint],
+  providers: [EquipmentsService],
+  exports: [EquipmentsService],
 })
 export class EquipmentsModule {}
