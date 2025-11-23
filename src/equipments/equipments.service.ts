@@ -91,7 +91,6 @@ export class EquipmentsService {
   async importFromCsv(buffer: Buffer): Promise<any> {
     const csvText = buffer.toString('utf-8');
     
-    // Parsează CSV
     let records;
     try {
       records = parse(csvText, {
@@ -108,7 +107,6 @@ export class EquipmentsService {
       throw new BadRequestException('Fișierul CSV nu conține date.');
     }
 
-    // Verifică numărul de coloane
     const expectedColumns = ['name', 'type', 'pricePerDay', 'available', 'location', 'year'];
     const actualColumns = Object.keys(records[0]);
     
@@ -122,11 +120,9 @@ export class EquipmentsService {
     const validRecords: any[] = [];
     const invalidRecords: any[] = [];
 
-    // Validează fiecare rând
     for (let i = 0; i < records.length; i++) {
       const record = records[i];
       
-      // Creează DTO
       const dto = plainToClass(CreateEquipmentDto, {
         name: record.name?.trim(),
         type: record.type?.trim(),
@@ -136,11 +132,9 @@ export class EquipmentsService {
         year: parseInt(record.year, 10),
       });
 
-      // Validează cu class-validator
       const errors = await validate(dto);
 
       if (errors.length === 0) {
-        // Date valide - salvează
         const newEquipment = {
           id: this.equipments.length + 1,
           ...dto,
@@ -151,7 +145,6 @@ export class EquipmentsService {
           data: dto,
         });
       } else {
-        // Date invalide - adaugă la lista de erori
         const errorMessages = errors.map(error => ({
           field: error.property,
           constraints: error.constraints,
@@ -164,7 +157,6 @@ export class EquipmentsService {
       }
     }
 
-    // Răspuns JSON
     return {
       message: `Import finalizat: ${validRecords.length} înregistrări valide din ${records.length} rânduri totale.`,
       summary: {
@@ -177,9 +169,7 @@ export class EquipmentsService {
     };
   }
 
-  /**
-   * Export CSV - generează fișier CSV cu datele filtrate
-   */
+
   async exportToCsv(filters?: {
     name?: string;
     type?: string;
@@ -190,7 +180,6 @@ export class EquipmentsService {
     
     let data = [...this.equipments];
 
-    // Aplică filtre
     if (filters) {
       if (filters.name) {
         data = data.filter(e => 
@@ -213,11 +202,9 @@ export class EquipmentsService {
       }
     }
 
-    // Creează fișier CSV
     const filename = `equipments_export_${Date.now()}.csv`;
     const filePath = path.join(process.cwd(), 'uploads', filename);
 
-    // Asigură-te că directorul uploads există
     const uploadsDir = path.join(process.cwd(), 'uploads');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });

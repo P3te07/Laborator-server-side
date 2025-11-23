@@ -15,21 +15,21 @@ export class EquipmentsController {
   constructor(private readonly equipmentsService: EquipmentsService) {}
 
   @Post('import')
-@HttpCode(HttpStatus.OK)
-@UseInterceptors(FileInterceptor('file'))
-async importCsv(@UploadedFile(CsvValidationPipe) file: Express.Multer.File) {
-  return this.equipmentsService.importFromCsv(file.buffer);
-}
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file'))
+  async importCsv(@UploadedFile(CsvValidationPipe) file: Express.Multer.File) {
+    return this.equipmentsService.importFromCsv(file.buffer);
+  }
 
-@Get('export')
-async exportCsv(
+  @Get('export')
+  async exportCsv(
   @Res() res: Response,
   @Query('name') name?: string,
   @Query('type') type?: string,
   @Query('minPrice') minPrice?: string,
   @Query('maxPrice') maxPrice?: string,
   @Query('available') available?: string,
-) {
+  ) {
   const filters: any = {};
   if (name) filters.name = name;
   if (type) filters.type = type;

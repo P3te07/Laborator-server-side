@@ -1,0 +1,6 @@
+ID,Nume,Tip,Pret pe Zi (MDL),Disponibil,Locatie,An
+1,Tractor John Deere 5075E,Tractor,120,true,Chișinău,2018
+11,Tractor Test Valid 1,Tractor,150,true,Chișinău,2021
+13,Tractor Test Valid 2,Tractor,200,true,Ungheni,2022
+14,Tractor Valid A,Tractor,150,true,Chișinău,2021
+16,Tractor Valid C,Tractor,200,true,Ungheni,2022
