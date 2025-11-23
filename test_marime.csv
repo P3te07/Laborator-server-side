@@ -1,0 +1,21 @@
+name,type,pricePerDay,available,location,year
+Tractor Test Equipment Number 1,Tractor,150,true,Chișinău Municipality Region,2021
+Combine Harvester Test Equipment Number 2,Combine,500,false,Bălți City Regional Area,2020
+Tractor Test Equipment Number 3,Tractor,200,true,Ungheni District Regional Center,2022
+Cultivator Test Equipment Number 4,Cultivator,180,true,Cahul Regional Administrative Unit,2019
+Seeder Test Equipment Number 5,Semănătoare,220,false,Orhei City Municipality Area,2021
+Trailer Test Equipment Number 6,Remorcă,150,true,Soroca District Regional Center,2020
+Plow Test Equipment Number 7,Plug,130,true,Criuleni Administrative Regional Unit,2018
+Sprayer Test Equipment Number 8,Distribuitor de îngrășăminte,170,false,Hâncești Municipality District Area,2022
+Baler Test Equipment Number 9,Atasament,190,true,Anenii Noi Regional District Center,2019
+Forklift Test Equipment Number 10,Stivuitor,210,true,Dubăsari Administrative Municipality,2021
+Tractor Test Equipment Number 11,Tractor,160,false,Chișinău Municipality Region,2020
+Combine Harvester Test Equipment Number 12,Combine,520,true,Bălți City Regional Area,2019
+Tractor Test Equipment Number 13,Tractor,210,true,Ungheni District Regional Center,2021
+Cultivator Test Equipment Number 14,Cultivator,190,false,Cahul Regional Administrative Unit,2020
+Seeder Test Equipment Number 15,Semănătoare,230,true,Orhei City Municipality Area,2022
+Trailer Test Equipment Number 16,Remorcă,160,true,Soroca District Regional Center,2019
+Plow Test Equipment Number 17,Plug,140,false,Criuleni Administrative Regional Unit,2021
+Sprayer Test Equipment Number 18,Distribuitor de îngrășăminte,180,true,Hâncești Municipality District Area,2020
+Baler Test Equipment Number 19,Atasament,200,false,Anenii Noi Regional District Center,2022
+Forklift Test Equipment Number 20,Stivuitor,220,true,Dubăsari Administrative Municipality,2019

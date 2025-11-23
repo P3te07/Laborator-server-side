@@ -1,0 +1,17 @@
+ID,Nume,Tip,Pret pe Zi (MDL),Disponibil,Locatie,An
+1,Tractor John Deere 5075E,Tractor,120,true,Chișinău,2018
+2,Combine Claas Lexion 760,Combine,450,false,Bălți,2016
+3,Plug Lemken 4 brazde,Plug,60,true,Ungheni,2012
+4,Semănătoare Amazone,Semănătoare,80,true,Cahul,2019
+5,Cuțit cosechină,Atasament,25,true,Orhei,2015
+6,Remorcă 6 tone,Remorcă,50,false,Soroca,2014
+7,Fertilizer spreader,Distribuitor de îngrășăminte,45,true,Criuleni,2017
+8,Cultivator Kverneland,Cultivator,70,true,Hâncești,2013
+9,Buldoexcavator JCB,Buldoexcavator,200,false,Anenii Noi,2011
+10,Stivuitor Toyota 2t,Stivuitor,90,true,Dubăsari,2020
+11,Tractor Valid A,Tractor,150,true,Chișinău,2021
+12,Combine Valid B,Combine,500,false,Bălți,2019
+13,Tractor Valid C,Tractor,200,true,Ungheni,2022
+14,Tractor Test Valid 1,Tractor,150,true,Chișinău,2021
+15,Combine Test Valid 1,Combine,500,false,Bălți,2020
+16,Tractor Test Valid 2,Tractor,200,true,Ungheni,2022

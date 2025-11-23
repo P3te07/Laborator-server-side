@@ -23,9 +23,10 @@
     "@fast-csv/format": "^5.0.5",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
-    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-express": "^11.1.9",
     "csv": "^6.4.1",
     "csv-parse": "^6.1.0",
+    "multer": "^2.0.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },

@@ -15,47 +15,44 @@ export class EquipmentsController {
   constructor(private readonly equipmentsService: EquipmentsService) {}
 
   @Post('import')
-  @HttpCode(HttpStatus.OK)
-  @UseInterceptors(FileInterceptor('file'))
-  async importCsv(
-    @UploadedFile(CsvValidationPipe) file: Express.Multer.File,
-  ) {
-    return this.equipmentsService.importFromCsv(file.buffer);
+@HttpCode(HttpStatus.OK)
+@UseInterceptors(FileInterceptor('file'))
+async importCsv(@UploadedFile(CsvValidationPipe) file: Express.Multer.File) {
+  return this.equipmentsService.importFromCsv(file.buffer);
+}
+
+@Get('export')
+async exportCsv(
+  @Res() res: Response,
+  @Query('name') name?: string,
+  @Query('type') type?: string,
+  @Query('minPrice') minPrice?: string,
+  @Query('maxPrice') maxPrice?: string,
+  @Query('available') available?: string,
+) {
+  const filters: any = {};
+  if (name) filters.name = name;
+  if (type) filters.type = type;
+  if (minPrice) filters.minPrice = parseFloat(minPrice);
+  if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
+  if (available !== undefined) {
+    filters.available = available === 'true';
   }
 
+  const { filePath, filename } = await this.equipmentsService.exportToCsv(filters);
 
-  @Get('export')
-  async exportCsv(
-    @Res() res: Response,
-    @Query('name') name?: string,
-    @Query('type') type?: string,
-    @Query('minPrice') minPrice?: string,
-    @Query('maxPrice') maxPrice?: string,
-    @Query('available') available?: string,
-  ) {
-    // Parsează filtrele
-    const filters: any = {};
-    if (name) filters.name = name;
-    if (type) filters.type = type;
-    if (minPrice) filters.minPrice = parseFloat(minPrice);
-    if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
-    if (available !== undefined) {
-      filters.available = available === 'true';
-    }
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
-    const { filePath, filename } = await this.equipmentsService.exportToCsv(filters);
+  const fileStream = fs.createReadStream(filePath);
 
-    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  fileStream.on('error', (error) => {
+    console.error('Eroare la citirea fișierului:', error);
+    res.status(500).json({ error: 'Eroare la generarea fișierului CSV' });
+  });
 
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-
-    // Șterge fișierul după trimitere
-    fileStream.on('end', () => {
-      fs.unlinkSync(filePath);
-    });
-  }
+  fileStream.pipe(res);
+}
 
   @Get('list')
   getAll() {

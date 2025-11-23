@@ -1,0 +1,4 @@
+name,type,pricePerDay,available,location,year
+Tractor Test Valid 1,Tractor,150,true,Chișinău,2021
+Combine Test Valid 1,Combine,500,false,Bălți,2020
+Tractor Test Valid 2,Tractor,200,true,Ungheni,2022

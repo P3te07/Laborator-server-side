@@ -4,7 +4,6 @@ import { UpdateEquipmentDto } from './dto/update-equipment.dto';
 import { CategoriesService } from '../categories/categories.service';
 import { parse } from 'csv-parse/sync';
 import { createObjectCsvWriter } from 'csv-writer';
-import { format,  } from '@fast-csv/format';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import * as fs from 'fs'
@@ -192,7 +191,7 @@ export class EquipmentsService {
     let data = [...this.equipments];
 
     // Aplică filtre
-   if (filters) {
+    if (filters) {
       if (filters.name) {
         data = data.filter(e => 
           e.name.toLowerCase().includes(filters.name!.toLowerCase())
